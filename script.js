@@ -10,7 +10,7 @@ class Snake {
         this.length = 2;
         this.speed = 1;
         this.direction = 'right';
-        this.lastDirection = 'right';
+        this.nextDirection = 'right';
         this.body = [{
             id : 1,
             x : 0,
@@ -20,59 +20,54 @@ class Snake {
             x : 0,
             y : 0,
         }];
+        this.head = this.body[0];
     }
 
     turnInterval(direction) {
         let intervalId = setInterval(() => {
             if (direction === 'up' || direction === 'down') {
-                if (this.body[0].x % 20 === 0) {
-                    this.direction = direction;
+                if (this.head.x % 20 === 0) {
+                    this.nextDirection = direction;
                     clearInterval(intervalId);
                 }
             }
             if (direction === 'right' || direction === 'left') {
-                if (this.body[0].y % 20 === 0) {
-                    this.direction = direction;
+                if (this.head.y % 20 === 0) {
+                    this.nextDirection = direction;
                     clearInterval(intervalId);
                 }
             }
-        }, 1);
+        }, 0);
     }
 
-    setDirection(keyCode) {
+    setNextDirection(keyCode) {
         switch (keyCode) {
             case 65:
-                if (this.direction === 'right') {
+                if (this.nextDirection === 'right') {
                     break;
                 }
                 this.turnInterval('left');
                 break;
             case 68:
-                if (this.direction === 'left') {
+                if (this.nextDirection === 'left') {
                     break;
                 }
                 this.turnInterval('right');
                 break;
             case 83:
-                if (this.direction === 'up') {
+                if (this.nextDirection === 'up') {
                     break;
                 }
                 this.turnInterval('down');
                 break;
             case 87:
-                if (this.direction === 'down') {
+                if (this.nextDirection === 'down') {
                     break;
                 }
                 this.turnInterval('up');
                 break;
             case 32:
-                if (this.direction !== 'stop') {
-                    this.lastDirection = this.direction;
-                    this.direction = 'stop';
-                } else {
-                    this.direction = this.lastDirection;
-                    this.speed = 1;
-                }
+                    this.speed = 0;
                 break;  
             default:
                 break;
@@ -85,47 +80,29 @@ class Snake {
 
     moveParts(direction){
         for (let i = this.body.length; i > 1; i--) {
-            switch (direction) {
-                case 'right':
-                    this.body[i-1].x = this.body[i - 2].x - 19;
-                    this.body[i-1].y = this.body[i - 2].y;
-                    break;
-                case 'left':
-                    this.body[i-1].x = this.body[i - 2].x + 19;
-                    this.body[i-1].y = this.body[i - 2].y;
-                    break;
-                case 'down':
-                    this.body[i-1].x = this.body[i - 2].x;
-                    this.body[i-1].y = this.body[i - 2].y - 19;
-                    break;
-                case 'up':
-                    this.body[i-1].x = this.body[i - 2].x;
-                    this.body[i-1].y = this.body[i - 2].y + 19;
-                    break;
-                default:
-                    break;
-            }
-
+            this.body[i-1].x = this.body[i - 2].x;
+            this.body[i-1].y = this.body[i - 2].y;
         }
     }
 
     move() {
-        switch (this.direction) {
+        this.direction = this.nextDirection;
+        switch (this.nextDirection) {
             case 'right':
                 this.moveParts('right');
-                this.body[0].x += this.speed;
+                this.head.x += this.speed;
                 break;
             case 'left':
                 this.moveParts('left');
-                this.body[0].x -= this.speed;
+                this.head.x -= this.speed;
                 break;
             case 'down':
                 this.moveParts('down');
-                this.body[0].y += this.speed;
+                this.head.y += this.speed;
                 break;
             case 'up':
                 this.moveParts('up');
-                this.body[0].y -= this.speed;
+                this.head.y -= this.speed;
                 break;
             case 'stop':
                 this.speed = 0;
@@ -137,21 +114,21 @@ class Snake {
     }
     
     checkCollision() {
-        if (this.body[0].x === width || this.body[0].x < 0) {
+        if (this.head.x === width || this.head.x < 0) {
             stopGame();
         };
-        if (this.body[0].y === height || this.body[0].y < 0) {
+        if (this.head.y === height || this.head.y < 0) {
             stopGame();
         };
         for (let i = 1; i < this.body.length; i++) {
-            if (this.body[0].x === this.body[i].x && this.body[0].y === this.body[i].y) {
+            if (this.head.x === this.body[i].x && this.head.y === this.body[i].y) {
                 stopGame();
             }            
         }
     }
 
     eatApple() {
-        if (this.body[0].x === apple.x && this.body[0].y === apple.y) {
+        if (this.head.x === apple.x && this.head.y === apple.y) {
             this.length++;
             this.body.push({
                 id : this.length,
@@ -170,9 +147,9 @@ class Snake {
 
     listenKey() {
         let self = this;
-        $('body').keydown(function (event) {
+        document.getElementById('body').addEventListener('keydown', event => {
             let keyCode =  event.keyCode;
-            self.setDirection(keyCode);
+            self.setNextDirection(keyCode);
         });
     }
 }
@@ -218,7 +195,7 @@ function drawBlocks() {
 
 function updateScores() {
     let score = snake.length;
-    $('#scores').text('Счёт: ' + score);
+    document.getElementById('scores').innerHTML = 'Scores: ' + score;
 }
 
 function gameCycle() {
@@ -244,7 +221,7 @@ function startGame() {
 
 function stopGame() {
     clearInterval(intervalId);
-    $('#gameOver').text('Game Over!');
+    document.getElementById('gameOver').innerHTML = 'Game Over!';
 }
 
 let snake;
