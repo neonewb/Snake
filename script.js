@@ -21,33 +21,30 @@ class Snake {
 
     setNextDirection(keyCode) {
         switch (keyCode) {
-            case 65:
+            case left:
                 if (this.nextDirection === 'right') {
                     break;
                 }
                 this.nextDirection = 'left';
                 break;
-            case 68:
+            case right:
                 if (this.nextDirection === 'left') {
                     break;
                 }
                 this.nextDirection ='right';
                 break;
-            case 83:
+            case down:
                 if (this.nextDirection === 'up') {
                     break;
                 }
                 this.nextDirection = 'down';
                 break;
-            case 87:
+            case up:
                 if (this.nextDirection === 'down') {
                     break;
                 }
                 this.nextDirection = 'up';
                 break;
-            case 32:
-                    this.speed = 0;
-                break;  
             default:
                 break;
         }
@@ -144,8 +141,8 @@ class Snake {
             return { identifier: touch.identifier, pageX: touch.pageX, pageY: touch.pageY };
         }
         function ongoingTouchIndexById(idToFind) {
-            for (var i = 0; i < ongoingTouches.length; i++) {
-              var id = ongoingTouches[i].identifier;
+            for (let i = 0; i < ongoingTouches.length; i++) {
+              let id = ongoingTouches[i].identifier;
               
               if (id == idToFind) {
                 return i;
@@ -162,26 +159,20 @@ class Snake {
         function handleStart(evt) {
             evt.preventDefault();
             console.log("touchstart.");
-            var el = document.getElementsByTagName("canvas")[0];
-            var ctx = el.getContext("2d");
-            var touches = evt.changedTouches;
+            let touches = evt.changedTouches;
  
-            for (var i = 0; i < touches.length; i++) {
+            for (let i = 0; i < touches.length; i++) {
                 console.log("touchstart:" + i + "...");
                 ongoingTouches.push(copyTouch(touches[i]));
-                var color = 'Black';
                 console.log("touchstart:" + i + ".");
             }
         }
         function handleMove(evt) {
             evt.preventDefault();
-            var el = document.getElementsByTagName("canvas")[0];
-            var ctx = el.getContext("2d");
-            var touches = evt.changedTouches;
+            let touches = evt.changedTouches;
           
-            for (var i = 0; i < touches.length; i++) {
-              var color = 'Black';
-              var idx = ongoingTouchIndexById(touches[i].identifier);
+            for (let i = 0; i < touches.length; i++) {
+              let idx = ongoingTouchIndexById(touches[i].identifier);
           
               if (idx >= 0) {
                 console.log("continuing touch "+idx);
@@ -192,22 +183,19 @@ class Snake {
 
                 if (Math.abs(ongoingTouches[idx].pageY - touches[i].pageY) > Math.abs(ongoingTouches[idx].pageX - touches[i].pageX)) {
                     if(ongoingTouches[idx].pageY < touches[i].pageY) {
-                        snake.setNextDirection(83)
+                        snake.setNextDirection(down)
                     }
                     if(ongoingTouches[idx].pageY > touches[i].pageY) {
-                        snake.setNextDirection(87)
+                        snake.setNextDirection(up)
                     }
                 } else {
                     if(ongoingTouches[idx].pageX < touches[i].pageX) {
-                        snake.setNextDirection(68)
+                        snake.setNextDirection(right)
                     }
                     if(ongoingTouches[idx].pageX > touches[i].pageX) {
-                        snake.setNextDirection(65)
+                        snake.setNextDirection(left)
                     }
                 }
-
-
-
                 ongoingTouches.splice(idx, 1, copyTouch(touches[i]));  // swap in the new touch record
                 console.log(".");
               } else {
@@ -218,14 +206,10 @@ class Snake {
         function handleEnd(evt) {
             evt.preventDefault();
             console.log("touchend");
-            var el = document.getElementsByTagName("canvas")[0];
-            var ctx = el.getContext("2d");
-            var touches = evt.changedTouches;
+            let touches = evt.changedTouches;
           
-            for (var i = 0; i < touches.length; i++) {
-              var color = 'Black';
-              var idx = ongoingTouchIndexById(touches[i].identifier);
-          
+            for (let i = 0; i < touches.length; i++) {
+              let idx = ongoingTouchIndexById(touches[i].identifier);
               if (idx >= 0) {
                 ongoingTouches.splice(idx, 1);  // remove it; we're done
               } else {
@@ -236,9 +220,8 @@ class Snake {
         function handleCancel(evt) {
             evt.preventDefault();
             console.log("touchcancel.");
-            var touches = evt.changedTouches;
-            
-            for (var i = 0; i < touches.length; i++) {
+            let touches = evt.changedTouches;
+            for (let i = 0; i < touches.length; i++) {
               ongoingTouches.splice(i, 1);  // remove it; we're done
             }
         }
@@ -325,4 +308,7 @@ let apple;
 let intervalId;
 startGame();
 
-
+const left = 65;
+const right = 68;
+const down = 83;
+const up = 87;
