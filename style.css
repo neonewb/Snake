@@ -11,3 +11,9 @@ body {
     margin: 0;
     font-size: 50px;
 }
+
+#restart {
+    margin: 0;
+    font-size: 50px;
+    display: none;
+}
