@@ -190,19 +190,23 @@ class Snake {
 
                 console.log("ctx.lineTo(" + touches[i].pageX + ", " + touches[i].pageY + ");");
 
-                
-                if(ongoingTouches[idx].pageY < touches[i].pageY) {
-                    snake.setNextDirection(83)
+                if (Math.abs(ongoingTouches[idx].pageY - touches[i].pageY) > Math.abs(ongoingTouches[idx].pageX - touches[i].pageX)) {
+                    if(ongoingTouches[idx].pageY < touches[i].pageY) {
+                        snake.setNextDirection(83)
+                    }
+                    if(ongoingTouches[idx].pageY > touches[i].pageY) {
+                        snake.setNextDirection(87)
+                    }
+                } else {
+                    if(ongoingTouches[idx].pageX < touches[i].pageX) {
+                        snake.setNextDirection(68)
+                    }
+                    if(ongoingTouches[idx].pageX > touches[i].pageX) {
+                        snake.setNextDirection(65)
+                    }
                 }
-                if(ongoingTouches[idx].pageY > touches[i].pageY) {
-                    snake.setNextDirection(87)
-                }
-                if(ongoingTouches[idx].pageX < touches[i].pageX) {
-                    snake.setNextDirection(68)
-                }
-                if(ongoingTouches[idx].pageX > touches[i].pageX) {
-                    snake.setNextDirection(65)
-                }
+
+
 
                 ongoingTouches.splice(idx, 1, copyTouch(touches[i]));  // swap in the new touch record
                 console.log(".");
