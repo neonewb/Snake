@@ -135,9 +135,109 @@ class Snake {
     listenKey() {
         let self = this;
         document.getElementById('body').addEventListener('keydown', event => {
-            let keyCode =  event.keyCode;
+            let keyCode = event.keyCode;
             self.setNextDirection(keyCode);
         });
+
+        let ongoingTouches = new Array();
+        function copyTouch(touch) {
+            return { identifier: touch.identifier, pageX: touch.pageX, pageY: touch.pageY };
+        }
+        function ongoingTouchIndexById(idToFind) {
+            for (var i = 0; i < ongoingTouches.length; i++) {
+              var id = ongoingTouches[i].identifier;
+              
+              if (id == idToFind) {
+                return i;
+              }
+            }
+            return -1;    // not found
+        }
+
+        canvas.addEventListener("touchstart", handleStart, false);
+        canvas.addEventListener("touchend", handleEnd, false);
+        canvas.addEventListener("touchcancel", handleCancel, false);
+        canvas.addEventListener("touchmove", handleMove, false);
+
+        function handleStart(evt) {
+            evt.preventDefault();
+            console.log("touchstart.");
+            var el = document.getElementsByTagName("canvas")[0];
+            var ctx = el.getContext("2d");
+            var touches = evt.changedTouches;
+ 
+            for (var i = 0; i < touches.length; i++) {
+                console.log("touchstart:" + i + "...");
+                ongoingTouches.push(copyTouch(touches[i]));
+                var color = 'Black';
+                console.log("touchstart:" + i + ".");
+            }
+        }
+        function handleMove(evt) {
+            evt.preventDefault();
+            var el = document.getElementsByTagName("canvas")[0];
+            var ctx = el.getContext("2d");
+            var touches = evt.changedTouches;
+          
+            for (var i = 0; i < touches.length; i++) {
+              var color = 'Black';
+              var idx = ongoingTouchIndexById(touches[i].identifier);
+          
+              if (idx >= 0) {
+                console.log("continuing touch "+idx);
+
+                console.log("ctx.moveTo(" + ongoingTouches[idx].pageX + ", " + ongoingTouches[idx].pageY + ");");
+
+                console.log("ctx.lineTo(" + touches[i].pageX + ", " + touches[i].pageY + ");");
+
+                
+                if(ongoingTouches[idx].pageY < touches[i].pageY) {
+                    snake.setNextDirection(83)
+                }
+                if(ongoingTouches[idx].pageY > touches[i].pageY) {
+                    snake.setNextDirection(87)
+                }
+                if(ongoingTouches[idx].pageX < touches[i].pageX) {
+                    snake.setNextDirection(68)
+                }
+                if(ongoingTouches[idx].pageX > touches[i].pageX) {
+                    snake.setNextDirection(65)
+                }
+
+                ongoingTouches.splice(idx, 1, copyTouch(touches[i]));  // swap in the new touch record
+                console.log(".");
+              } else {
+                console.log("can't figure out which touch to continue");
+              }
+            }
+        }
+        function handleEnd(evt) {
+            evt.preventDefault();
+            console.log("touchend");
+            var el = document.getElementsByTagName("canvas")[0];
+            var ctx = el.getContext("2d");
+            var touches = evt.changedTouches;
+          
+            for (var i = 0; i < touches.length; i++) {
+              var color = 'Black';
+              var idx = ongoingTouchIndexById(touches[i].identifier);
+          
+              if (idx >= 0) {
+                ongoingTouches.splice(idx, 1);  // remove it; we're done
+              } else {
+                console.log("can't figure out which touch to end");
+              }
+            }
+        }
+        function handleCancel(evt) {
+            evt.preventDefault();
+            console.log("touchcancel.");
+            var touches = evt.changedTouches;
+            
+            for (var i = 0; i < touches.length; i++) {
+              ongoingTouches.splice(i, 1);  // remove it; we're done
+            }
+        }
     }
 }
 
